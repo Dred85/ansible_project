@@ -29,11 +29,11 @@
         dest: "{{ archive_dir }}/{{ item.path | basename | regex_replace('.log$', '') }}_{{ ansible_date_time.date }}.tar.gz"
         format: gz
       loop: "{{ found_logs.files }}"
-      when: item.mtime < (ansible_date_time.iso8601 | to_datetime('%Y-%m-%dT%H:%M:%S.%fZ') | to_timestamp('2022-06-30 23:59:59'))
+      when: item.mtime < (ansible_date_time.iso8601 | to_datetime('%Y-%m-%dT%H:%M:%S.%fZ') | to_timestamp(archive_before_date))
 
     - name: Удалить архивированные логи
       file:
         path: "{{ item.path }}"
         state: absent
       loop: "{{ found_logs.files }}"
-      when: item.mtime < (ansible_date_time.iso8601 | to_datetime('%Y-%m-%dT%H:%M:%S.%fZ') | to_timestamp('2022-06-30 23:59:59'))
+      when: item.mtime < (ansible_date_time.iso8601 | to_datetime('%Y-%m-%dT%H:%M:%S.%fZ') | to_timestamp(archive_before_date))

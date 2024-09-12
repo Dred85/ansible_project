@@ -4,7 +4,9 @@ common_group: "deploy_group"
 
 # Параметры для проверки сервиса
 service_name: "nginx"
-service_check_interval: 5  # Интервал проверки статуса сервиса в минутах
+
+# Интервал проверки статуса сервиса в минутах
+service_check_interval: 5
 
 # Параметры для архивации логов
 log_dirs:
@@ -12,6 +14,8 @@ log_dirs:
   - "/opt/log/service_log/authoriz"
   - "/opt/log/service_log/authentic"
 archive_dir: "/opt/log/archive"
+# Дата для архивирования
+archive_before_date: "2022-06-30 23:59:59"
 
 # Настройки для уведомлений
 email_recipient: "email@example.com" #  задать адрес электронной почты получателя уведомлений
