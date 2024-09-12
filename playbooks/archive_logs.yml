@@ -1,0 +1,30 @@
+---
+- name: Архивация логов
+  hosts: your_target_hosts  # Замените на вашу группу хостов
+  become: yes
+  vars:
+    log_dirs:
+      - /opt/log/service_log/accounting
+      - /opt/log/service_log/authoriz
+      - /opt/log/service_log/authentic
+    archive_dir: /opt/log/archive  # Директория для архивов
+
+  tasks:
+    - name: Убедиться, что директория для архивов существует
+      file:
+        path: "{{ archive_dir }}"
+        state: directory
+
+    - name: Архивация логов до 30.06.2022
+      find:
+        paths: "{{ item }}"
+        patterns: "*.log"
+        age: "30 days"  # Указываем, что хотим логи старше 30 дней
+      loop: "{{ log_dirs }}"
+      register: found_logs
+
+    - name: Архивировать и удалить старые логи
+      command: >
+        tar -czf {{ archive_dir }}/{{ item.path | basename | regex_replace('.log$', '') }}_{{ ansible_date_time.date }}.tar.gz {{ item.path }} && rm -f {{ item.path }}
+      loop: "{{ found_logs.files }}"
+      when: item.mtime < (ansible_date_time.iso8601 | to_datetime('%Y-%m-%dT%H:%M:%S.%fZ') | to_timestamp) - 15778800  # Условие для логов до 30.06.2022
