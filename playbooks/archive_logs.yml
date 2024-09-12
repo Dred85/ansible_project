@@ -1,6 +1,6 @@
 ---
 - name: Архивация логов
-  hosts: webservers  # Заменить на нашу группу хостов
+  hosts: webservers
   become: yes
   vars_files:
     - all.yml
@@ -11,16 +11,29 @@
         path: "{{ archive_dir }}"
         state: directory
 
-    - name: Архивация логов до 30.06.2022
+    - name: Находим логи
       find:
         paths: "{{ item }}"
         patterns: "*.log"
-        age: "30 days"  # Указываем, что хотим логи старше 30 дней
       loop: "{{ log_dirs }}"
       register: found_logs
 
-    - name: Архивировать и удалить старые логи
-      command: >
-        tar -czf {{ archive_dir }}/{{ item.path | basename | regex_replace('.log$', '') }}_{{ ansible_date_time.date }}.tar.gz {{ item.path }} && rm -f {{ item.path }}
+    - name: Проверить, есть ли найденные логи
+      fail:
+        msg: "Логи не найдены для архивирования!"
+      when: found_logs.matched == 0
+
+    - name: Архивировать старые логи
+      archive:
+        path: "{{ item.path }}"
+        dest: "{{ archive_dir }}/{{ item.path | basename | regex_replace('.log$', '') }}_{{ ansible_date_time.date }}.tar.gz"
+        format: gz
       loop: "{{ found_logs.files }}"
-      when: item.mtime < (ansible_date_time.iso8601 | to_datetime('%Y-%m-%dT%H:%M:%S.%fZ') | to_timestamp) - 15778800  # Условие для логов до 30.06.2022
+      when: item.mtime < (ansible_date_time.iso8601 | to_datetime('%Y-%m-%dT%H:%M:%S.%fZ') | to_timestamp('2022-06-30 23:59:59'))
+
+    - name: Удалить архивированные логи
+      file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ found_logs.files }}"
+      when: item.mtime < (ansible_date_time.iso8601 | to_datetime('%Y-%m-%dT%H:%M:%S.%fZ') | to_timestamp('2022-06-30 23:59:59'))

@@ -12,7 +12,6 @@ log_dirs:
   - "/opt/log/service_log/authoriz"
   - "/opt/log/service_log/authentic"
 archive_dir: "/opt/log/archive"
-log_age: "30 days"  # Возраст логов для архивации
 
 # Настройки для уведомлений
 email_recipient: "email@example.com" #  задать адрес электронной почты получателя уведомлений
