@@ -1,5 +1,5 @@
 ---
-- name: Проверка и управление сервисом Nginx
+- name: Проверка и управление сервисом {{ service_name }}
   hosts: webservers
   become: yes
   vars_files:
