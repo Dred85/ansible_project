@@ -2,10 +2,8 @@
 - name: Проверка и управление сервисом Nginx
   hosts: webservers
   become: yes
-  vars:
-    service_name: nginx
-    log_file: /var/log/service_check.log
-    email_recipient: email@example.com # сюда надо прописать нужный email
+  vars_files:
+    - all.yml
 
   tasks:
     - name: Проверка статуса сервиса
@@ -38,7 +36,7 @@
 
     - name: Отправка уведомления по электронной почте, если сервис все еще недоступен
       mail:
-        host: localhost  # Замените на ваш SMTP-сервер
+        host: "{{ smtp_host }}"  # Используем переменную из all.yml
         to: "{{ email_recipient }}"
         subject: "Проблема с сервисом {{ service_name }}"
         body: "{{ ansible_date_time.iso8601 }}: {{ service_name }} {{ 'недоступен' if new_service_status.rc != 0 else 'доступен' }}"

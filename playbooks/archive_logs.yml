@@ -1,13 +1,9 @@
 ---
 - name: Архивация логов
-  hosts: your_target_hosts  # Замените на вашу группу хостов
+  hosts: webservers  # Заменить на нашу группу хостов
   become: yes
-  vars:
-    log_dirs:
-      - /opt/log/service_log/accounting
-      - /opt/log/service_log/authoriz
-      - /opt/log/service_log/authentic
-    archive_dir: /opt/log/archive  # Директория для архивов
+  vars_files:
+    - all.yml
 
   tasks:
     - name: Убедиться, что директория для архивов существует

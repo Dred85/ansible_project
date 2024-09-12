@@ -1,0 +1,19 @@
+# Общие настройки для всех хостов
+common_user: "deploy_user"
+common_group: "deploy_group"
+
+# Параметры для проверки сервиса
+service_name: "nginx"
+service_check_interval: 5  # Интервал проверки статуса сервиса в минутах
+
+# Параметры для архивации логов
+log_dirs:
+  - "/opt/log/service_log/accounting"
+  - "/opt/log/service_log/authoriz"
+  - "/opt/log/service_log/authentic"
+archive_dir: "/opt/log/archive"
+log_age: "30 days"  # Возраст логов для архивации
+
+# Настройки для уведомлений
+email_recipient: "email@example.com" #  задать адрес электронной почты получателя уведомлений
+smtp_host: "smtp.example.com"  # Здесь указать рабочий SMTP сервер
