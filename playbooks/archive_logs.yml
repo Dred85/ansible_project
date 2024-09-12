@@ -15,7 +15,7 @@
       find:
         paths: "{{ item }}"
         patterns: "*.log"
-        age: "30 days"  # Указываем, что хотим логи старше 30 дней
+        age: "{{ log_age }}"
       loop: "{{ log_dirs }}"
       register: found_logs
 
