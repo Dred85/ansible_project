@@ -8,6 +8,9 @@ service_name: "nginx"
 # Интервал проверки статуса сервиса в минутах
 service_check_interval: 5
 
+# Здесь указать путь до папки с логами
+log_file: "/logs/service_check.log"
+
 # Параметры для архивации логов
 log_dirs:
   - "/opt/log/service_log/accounting"
