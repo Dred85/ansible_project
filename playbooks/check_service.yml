@@ -35,9 +35,16 @@
       when: start_service.changed
 
     - name: Отправка уведомления по электронной почте, если сервис все еще недоступен
-      mail:
-        host: "{{ smtp_host }}"  # Использую переменную из all.yml
-        to: "{{ email_recipient }}"
-        subject: "Проблема с сервисом {{ service_name }}"
-        body: "{{ ansible_date_time.iso8601 }}: {{ service_name }} {{ 'недоступен' if new_service_status.rc != 0 else 'доступен' }}"
+      block:
+        - name: Запись сообщения в логфайл
+          lineinfile:
+            path: "{{ log_file }}"
+            line: "{{ ansible_date_time.iso8601 }}: {{ service_name }} недоступен"
+
+        - name: Отправка уведомления по электронной почте
+          mail:
+            host: "{{ smtp_host }}"
+            to: "{{ email_recipient }}"
+            subject: "Проблема с сервисом {{ service_name }}"
+            body: "{{ ansible_date_time.iso8601 }}: {{ service_name }} недоступен"
       when: new_service_status.rc != 0
