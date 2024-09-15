@@ -18,6 +18,3 @@
 
 
 
-Для запуска playbook, можно использовать команды:   
-- ansible-playbook -i inventory/hosts.ini playbooks/check_service.yml  
-- ansible-playbook -i inventory/hosts.ini playbooks/archive_logs.yml  
