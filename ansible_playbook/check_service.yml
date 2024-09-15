@@ -3,8 +3,3 @@
   become: yes
   roles:
     - check_service
-
-
-
-
-
