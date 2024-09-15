@@ -1,40 +1,40 @@
 ---
-- name: Ensure service is running
+- name: Ensure service is running  # Убедимся, что сервис работает
   command: systemctl is-active {{ service_name }} # Используем переменную из group_vars/all.yml
   register: service_status
   ignore_errors: yes
 
-- name: Recording status in a log file
+- name: Recording status in a log file  # Запись статуса в логфайл
   lineinfile:
     path: "{{ log_file }}"
     line: "{{ ansible_date_time.iso8601 }}: {{ 'OK' if service_status.rc == 0 else 'Сервис недоступен' }}"
 
-- name: Start a service if it is unavailable
+- name: Start a service if it is unavailable  # Запуск сервиса, если он недоступен
   systemd:
     name: "{{ service_name }}"
     state: started
   when: service_status.rc != 0
   register: start_service
 
-- name: Recording the launch result to a log file
+- name: Recording the launch result to a log file  # Запись результата запуска в логфайл
   lineinfile:
     path: "{{ log_file }}"
     line: "{{ ansible_date_time.iso8601 }}: Сервис успешно запущен"
   when: start_service.changed
 
-- name: Checking the service status after launch
+- name: Checking the service status after launch  # Проверка статуса сервиса после запуска
   command: systemctl is-active {{ service_name }}
   register: new_service_status
   when: start_service.changed
 
-- name: Send an email notification if the service is still unavailable
+- name: Send an email notification if the service is still unavailable  # Отправка уведомления по электронной почте, если сервис все еще недоступен
   block:
-    - name: Recording a message to a log file
+    - name: Recording a message to a log file  # Запись сообщения в логфайл
       lineinfile:
         path: "{{ log_file }}"
         line: "{{ ansible_date_time.iso8601 }}: {{ service_name }} недоступен"
 
-    - name: Sending an email notification
+    - name: Sending an email notification  # Отправка уведомления по электронной почте
       mail:
         host: "{{ smtp_host }}"
         to: "{{ email_recipient }}"

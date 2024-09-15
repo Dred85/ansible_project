@@ -1,22 +1,22 @@
 ---
-- name: Make sure the archive directory exists
+- name: Make sure the archive directory exists  # Убедиться, что директория для архивов существует
   file:
     path: "{{ archive_dir }}"
     state: directory
 
-- name: Finding logs
+- name: Finding logs  # Находим логи
   find:
     paths: "{{ item }}"
     patterns: "*.log"
   loop: "{{ log_dirs }}"
   register: found_logs
 
-- name: Check if there are logs found
+- name: Check if there are logs found  # Проверить, есть ли найденные логи
   fail:
     msg: "Логи не найдены для архивирования!"
   when: found_logs.matched == 0
 
-- name: Archive old logs
+- name: Archive old logs  # Архивировать старые логи
   archive:
     path: "{{ item.path }}"
     dest: "{{ archive_dir }}/{{ item.path | basename | regex_replace('.log$', '') }}_{{ ansible_date_time.date }}.tar.gz"
@@ -24,7 +24,7 @@
   loop: "{{ found_logs.files }}"
   when: item.mtime < (ansible_date_time.iso8601 | to_datetime('%Y-%m-%dT%H:%M:%S.%fZ') | to_timestamp(archive_before_date))
 
-- name: Delete archived logs
+- name: Delete archived logs  # Удалить архивированные логи
   file:
     path: "{{ item.path }}"
     state: absent
