@@ -1,0 +1,5 @@
+---
+- hosts: log_servers
+  become: yes
+  roles:
+    - archive_logs

@@ -1,0 +1,43 @@
+---
+- name: Ensure service is running
+  command: systemctl is-active {{ service_name }} # Используем переменную из group_vars/all.yml
+  register: service_status
+  ignore_errors: yes
+
+- name: Recording status in a log file
+  lineinfile:
+    path: "{{ log_file }}"
+    line: "{{ ansible_date_time.iso8601 }}: {{ 'OK' if service_status.rc == 0 else 'Сервис недоступен' }}"
+
+- name: Start a service if it is unavailable
+  systemd:
+    name: "{{ service_name }}"
+    state: started
+  when: service_status.rc != 0
+  register: start_service
+
+- name: Recording the launch result to a log file
+  lineinfile:
+    path: "{{ log_file }}"
+    line: "{{ ansible_date_time.iso8601 }}: Сервис успешно запущен"
+  when: start_service.changed
+
+- name: Checking the service status after launch
+  command: systemctl is-active {{ service_name }}
+  register: new_service_status
+  when: start_service.changed
+
+- name: Send an email notification if the service is still unavailable
+  block:
+    - name: Recording a message to a log file
+      lineinfile:
+        path: "{{ log_file }}"
+        line: "{{ ansible_date_time.iso8601 }}: {{ service_name }} недоступен"
+
+    - name: Sending an email notification
+      mail:
+        host: "{{ smtp_host }}"
+        to: "{{ email_recipient }}"
+        subject: "Проблема с сервисом {{ service_name }}"
+        body: "{{ ansible_date_time.iso8601 }}: {{ service_name }} недоступен"
+  when: new_service_status.rc != 0

@@ -8,7 +8,7 @@ service_name: "nginx"
 # Интервал проверки статуса сервиса в минутах
 service_check_interval: 5
 
-# Здесь указать путь до папки с логами
+# путь до папки с логами
 log_file: "/logs/service_check.log"
 
 # Параметры для архивации логов
@@ -23,3 +23,5 @@ archive_before_date: "2022-06-30 23:59:59"
 # Настройки для уведомлений
 email_recipient: "email@example.com" #  задать адрес электронной почты получателя уведомлений
 smtp_host: "smtp.example.com"  # Здесь указать рабочий SMTP сервер
+
+

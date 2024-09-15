@@ -1,0 +1,3 @@
+---
+compression_format: "gz"  # Формат архивации логов
+delete_after_archive: true  # Удалять ли логи после архивации
